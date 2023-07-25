@@ -79,18 +79,29 @@ class plane:
         self.mtl = mtl
         self.h = h
 
+
         x1, y1, z1 = a[0], a[1], a[2]
         x2, y2, z2 = b[0], b[1], b[2]
         x3, y3, z3 = c[0], c[1], c[2]
 
+        self.D = (self.normal[0] * x1 + self.normal[1] * y1 + self.normal[2] * z1)
+
         self.A = y1 * (z2 - z3) + y2 * (z3 - z1) + y3 * (z1 - z2)
         self.B = z1 * (x2 - x3) + z2 * (x3 - x1) + z3 * (x1 - x2)
         self.C = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)
-        self.D = -x1 * (y2 * z3 - y3 * z2) - x2 * (y3 * z1 - y1 * z3) - x3 * (y1 * z2 - y2 * z1)
+
+        # self.D = -x1 * (y2 * z3 - y3 * z2) - x2 * (y3 * z1 - y1 * z3) - x3 * (y1 * z2 - y2 * z1)
         # self.transmission = 1.3
 
+    # def planeSDF(self, p):
+    #     temp = vec([self.A, self.C, self.B])
+    #     return np.dot(p, temp) - self.D
+
     def planeSDF(self, p, h):
-        return np.dot(p, self.normal) + h
+        temp = vec([self.A, self.C, self.B])
+        print(temp / np.linalg.norm(temp))
+        print(self.normal)
+        return np.dot(p, self.normal) - self.D
     def checkSide(self, p):
         # A = self.normal[0]
         # B = self.normal[1]
