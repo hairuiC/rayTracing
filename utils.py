@@ -13,6 +13,18 @@ def random_in_unit_disk(r):  # 单位圆内随机取一点
 
     return sqrt(x) * cos(a), sqrt(x) * sin(a)
 
+def cal_norm(a, b, c):
+    x1, y1, z1 = a[0], a[1], a[2]
+    x2, y2, z2 = b[0], b[1], b[2]
+    x3, y3, z3 = c[0], c[1], c[2]
+
+    A = y1 * (z2 - z3) + y2 * (z3 - z1) + y3 * (z1 - z2)
+    C = z1 * (x2 - x3) + z2 * (x3 - x1) + z3 * (x1 - x2)
+    B = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)
+
+    norm = vec([A, B, C]) / np.linalg.norm(vec(A, B, C))
+    return norm
+
 def zebra_light_origin(step):
     # linspace = np.linspace(0, 1, 6)
     # print(linspace)

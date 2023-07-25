@@ -16,17 +16,17 @@ material_receiver = Material(roughness=0.0, transmission=0.0, ior=1) # 光线碰
 
 up_mirror = plane(h=0,
                   a=vec([6.25, 0., 8]),
-                  b=vec([-6.25, 0., 8]),
+                  d=vec([-6.25, 0., 8]),
                   c=vec([-6.25, 0., -8]),
-                  d=vec([6.25, 0., -8]),
+                  b=vec([6.25, 0., -8]),
                   normal=vec([0., 1., 0.]),
                   mtl=material_glass)
 
 bottom_mirror = plane(h=-0.03,
                       a=vec([6.25, -0.03, 8]),
-                      b=vec([-6.25, -0.03, 8]),
+                      d=vec([-6.25, -0.03, 8]),
                       c=vec([-6.25, -0.03, -8]),
-                      d=vec([6.25, -0.03, -8]),
+                      b=vec([6.25, -0.03, -8]),
                       normal=vec([0., 1., 0.]),
                       mtl=material_ref)
 
@@ -67,7 +67,7 @@ def intersect_obj(p, ray):
     o = plane(sdf=max_sdf)
     for i in range(len(obj)):
         oi = obj[i]
-        oi.sdf = oi.planeSDF(p=p, h=oi.h)
+        oi.sdf = oi.planeSDF(p=p)
         # 条件1：np.dot(startpoint, normal) 与 np.dot(dir, normal)符号相反
         # 条件2：sdf在所有obj中最小
 

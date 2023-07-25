@@ -75,7 +75,7 @@ class plane:
         self.d = d
         self.sdf = sdf
         self.receiver = receiver
-        self.normal = normal
+        # self.normal = normal
         self.mtl = mtl
         self.h = h
 
@@ -84,11 +84,15 @@ class plane:
         x2, y2, z2 = b[0], b[1], b[2]
         x3, y3, z3 = c[0], c[1], c[2]
 
+        self.A = y1 * (z2 - z3) + y2 * (z3 - z1) + y3 * (z1 - z2)
+        self.C = z1 * (x2 - x3) + z2 * (x3 - x1) + z3 * (x1 - x2)
+        self.B = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)
+
+        self.normal = vec([self.A, self.C, self.B]) / np.linalg.norm(vec([self.A, self.C, self.B]))
         self.D = (self.normal[0] * x1 + self.normal[1] * y1 + self.normal[2] * z1)
 
-        self.A = y1 * (z2 - z3) + y2 * (z3 - z1) + y3 * (z1 - z2)
-        self.B = z1 * (x2 - x3) + z2 * (x3 - x1) + z3 * (x1 - x2)
-        self.C = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)
+
+
 
         # self.D = -x1 * (y2 * z3 - y3 * z2) - x2 * (y3 * z1 - y1 * z3) - x3 * (y1 * z2 - y2 * z1)
         # self.transmission = 1.3
@@ -97,10 +101,10 @@ class plane:
     #     temp = vec([self.A, self.C, self.B])
     #     return np.dot(p, temp) - self.D
 
-    def planeSDF(self, p, h):
-        temp = vec([self.A, self.C, self.B])
-        print(temp / np.linalg.norm(temp))
-        print(self.normal)
+    def planeSDF(self, p,):
+        # temp = vec([self.A, self.C, self.B])
+        # print(temp / np.linalg.norm(temp))
+        # print(self.normal)
         return np.dot(p, self.normal) - self.D
     def checkSide(self, p):
         # A = self.normal[0]
@@ -109,37 +113,6 @@ class plane:
         D = -np.dot(self.normal, self.d)
         return np.sign(np.dot(self.normal, p) + D)
         # 小于0与法向量不在同一侧，大于0与法向量在同一侧
-
-
-
-    def SDF(self, p):
-
-        ba = self.b - self.a
-        cb = self.c - self.b
-        dc = self.d - self.c
-        ad = self.a - self.d
-
-        pa = p - self.a
-        pb = p - self.b
-        pc = p - self.c
-        pd = p - self.d
-
-        normal = np.cross(ba, ad)
-        temp = sqrt(sign(dot(np.cross(ba, normal), pa)) +
-                    sign(dot(np.cross(cb, normal), pb)) +
-                    sign(dot(np.cross(dc, normal), pc)) +
-                    sign(dot(np.cross(ad, normal), pd)))
-        if temp < 3.0:
-            return min(min(min(
-                dot2(ba * clamp(dot(ba, pa) / dot2(ba), 0.0, 1.0) - pa),
-                dot2(cb * clamp(dot(cb, pb) / dot2(cb), 0.0, 1.0) - pb)),
-                dot2(dc * clamp(dot(dc, pc) / dot2(dc), 0.0, 1.0) - pc)),
-                dot2(ad * clamp(dot(ad, pd) / dot2(ad), 0.0, 1.0) - pd))
-        else:
-            return dot(normal, pa) * dot(normal, pa) / dot2(normal)
-
-    # def calPos(self):
-
 
 
 
