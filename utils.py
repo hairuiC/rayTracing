@@ -13,6 +13,35 @@ def random_in_unit_disk(r):  # 单位圆内随机取一点
 
     return sqrt(x) * cos(a), sqrt(x) * sin(a)
 
+
+def getLightingPattern(mat, stride):
+    # kernel[[minx, miny], [maxx, maxy]]
+    # print(mat.shape)
+    matsize_x, matsize_y = mat.shape
+    minx, miny = 0, 0
+    maxx, maxy = minx + stride-1, miny + stride-1
+    kernel = [[minx, miny], [maxx, maxy]]
+    while(maxx < matsize_x and maxy < matsize_y):
+        # print(kernel)
+
+        #先走行
+        while(maxx < matsize_x):
+            while(maxy < matsize_y):
+                if np.random.rand() < 0.3:
+                    print(minx, maxx, miny, maxy)
+                    mat[minx:maxx+1,miny:maxy+1] = 1
+                miny += stride
+                maxy += stride
+                kernel = [[minx, miny], [maxx, maxy]]
+                # print(kernel)
+            miny = 0
+            maxy = miny + stride-1
+            minx += stride
+            maxx += stride
+    # print(mat)
+    return mat
+
+
 def cal_norm(a, b, c):
     x1, y1, z1 = a[0], a[1], a[2]
     x2, y2, z2 = b[0], b[1], b[2]
@@ -109,7 +138,7 @@ def hemispheric_sampling(n):  # 以 n 为法线进行半球采样
     #
     # return TBN(n) @ vec3(rxy, rz)
 
-def get_ray(lightSourceType, middle, radius, Pad_norm, step=0.):
+def get_ray(lightSourceType, middle, radius,LCD_Pad:plane, LightPattern, step=0.):
     if lightSourceType == 'parallel':
         x_coor, z_coor = random_in_unit_disk(radius)
         # print(vec([0, 0, 0]) - middle)
@@ -134,37 +163,47 @@ def get_ray(lightSourceType, middle, radius, Pad_norm, step=0.):
         ray_origin = vec([x, height, z])
         return Ray(origin=ray_origin, direction=direction)
     if lightSourceType == 'lightPad':
+        Pad_norm = LCD_Pad.normal
         # LCD板子上每一个点都是一个点光源
         ray_list = []
+        ray_origin = []
+        for i in range(len(LightPattern)):
+            for j in range(len(LightPattern[0])):
+                if LightPattern[i][j] == 1:
+                    temp_point = vec([i, 0, j])
+                    temp_point = TBN(Pad_norm) @ temp_point + vec([1, 5, -2])
+                    ray_origin.append(np.squeeze(np.array(temp_point)))
         # rota = rotation_matrix_from_vectors(vec([0, 1, 0]), Pad_norm)
         # mat_TBN = TBN(Pad_norm)
-        for i in range(10000): #每个点光源发100根光线
-            direction = hemispheric_sampling(Pad_norm)
-            # print(np.array(direction)[0])
-            # mat_TBN = TBN()
+        for origin in ray_origin:
+            ray_origin = origin
+            for i in range(1000): #每个点光源发100根光线
+                direction = hemispheric_sampling(Pad_norm)
+                # print(np.array(direction)[0])
+                # mat_TBN = TBN()
 
-            # u, v = np.random.rand(2)
-            # phi = 2 * np.pi * u
-            # theta = np.arccos(1 - v)
-            # x = sqrt(v) * np.cos(phi)
-            # z = sqrt(v) * np.sin(phi)
-            # y = sqrt(1 - v)
-            # # print(np.linalg.norm(vec([x, y, z])))
-            #
-            # rota_dir = rota* vec([x, y, z])
-            # rota_dir = rota_dir[:, 1]
-            # direction = vec(rota_dir)
-            # print(np.linalg.norm(direction))
-            # direction = direction / np.linalg.norm(direction)
-            # print(np.linalg.norm(direction))
+                # u, v = np.random.rand(2)
+                # phi = 2 * np.pi * u
+                # theta = np.arccos(1 - v)
+                # x = sqrt(v) * np.cos(phi)
+                # z = sqrt(v) * np.sin(phi)
+                # y = sqrt(1 - v)
+                # # print(np.linalg.norm(vec([x, y, z])))
+                #
+                # rota_dir = rota* vec([x, y, z])
+                # rota_dir = rota_dir[:, 1]
+                # direction = vec(rota_dir)
+                # print(np.linalg.norm(direction))
+                # direction = direction / np.linalg.norm(direction)
+                # print(np.linalg.norm(direction))
 
-            # print(rota_dir)
-            # print(np.linalg.norm(vec(rota_dir)))
-            # print(rota_dir / np.linalg.norm(vec(rota_dir)))
-            # direction = vec(rota_dir) / np.linalg.norm(vec(rota_dir))
-            ray_origin = vec((middle[0], middle[1], middle[2]))
-            direction = np.array(direction)[0]
-            ray_list.append(Ray(origin=ray_origin, direction=vec(direction)))
+                # print(rota_dir)
+                # print(np.linalg.norm(vec(rota_dir)))
+                # print(rota_dir / np.linalg.norm(vec(rota_dir)))
+                # direction = vec(rota_dir) / np.linalg.norm(vec(rota_dir))
+
+                direction = np.array(direction)[0]
+                ray_list.append(Ray(origin=ray_origin, direction=vec(direction)))
         return ray_list
 
 
@@ -221,6 +260,7 @@ def normal_discrete(plane:plane, hit_pos, ray):
     x_ratio = (x - min(plane.a[0], plane.b[0], plane.c[0], plane.d[0])) / RECEIVER_WIDTH
     y_ratio = (y - min(plane.a[2], plane.b[2], plane.c[2], plane.d[2])) / RECEIVER_HEIGHT
     # print(x_ratio*RECEIVER_WIDTH)
+    # print(RECEIVER.sum())
     RECEIVER[int(x_ratio*RECEIVER_WIDTH*DIS_LVL), int(y_ratio*RECEIVER_HEIGHT*DIS_LVL)] += ray.Radiance
     # dis = np.linspace(0, 1, dis_level) # x, y, z都要
     # dis_xup, dis_yup, dis_zup = 0, 0, 0

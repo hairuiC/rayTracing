@@ -24,13 +24,18 @@ def rotation_matrix_from_vectors(vec1, vec2):
     kmat = np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
     rotation_matrix = np.eye(3) + kmat + kmat.dot(kmat) * ((1 - c) / (s ** 2))
     return rotation_matrix
+# randx, y = np.random.rand(2)
+# print(randx, y)
+mat = np.zeros((10, 10))
+getLightingPattern(mat = mat, stride=2, padding=0)
 
-a = vec([0, -1, 0])
-b = vec([-1, 0, 0])
 
-rota = rotation_matrix_from_vectors(a, b)
-a = a.reshape(3, 1)
-print(a)
+# a = vec([0, -1, 0])
+# b = vec([-1, 0, 0])
+#
+# rota = rotation_matrix_from_vectors(a, b)
+# a = a.reshape(3, 1)
+# print(a)
 # print(rota * a)
 # print(a)
 # cos_thet

@@ -22,8 +22,8 @@ ENV_IOR = 1.000277
 
 image_plane = 0
 
-RECEIVER_WIDTH = 320
-RECEIVER_HEIGHT= 320
+RECEIVER_WIDTH = 500
+RECEIVER_HEIGHT= 500
 RECEIVER = np.zeros((RECEIVER_WIDTH, RECEIVER_HEIGHT))
 # WIDTH_dis = normal_discrete
 count_mirror=0
@@ -31,7 +31,7 @@ count_ref=0
 count_receiver=0
 ini_vec = vec([0, 0, 0])
 DIS_LVL = 10
-light_pattern = np.zeros((4, 4))
+light_pattern = np.zeros((1024, 768))
 
 att_kc = 1.0
 att_kl = 0.045
@@ -39,6 +39,9 @@ att_kq = 0.0075
 
 def dot2(v):
     return np.dot(v, v)
+
+
+
 
 def clamp(x, xmin, xmax):
     # print(max(xmin, x))

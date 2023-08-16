@@ -3,8 +3,11 @@ from LightSourceCustom import *
 from dataStructure import *
 # from MirrorShapeCustom import *
 import copy
+
+from dataStructure import plane
 from globalSetting import *
 import cv2
+from threading import Thread, current_thread
 
 
 material_glass = Material(roughness=0.0, transmission=0.95, ior=1.5)
@@ -31,10 +34,10 @@ bottom_mirror = plane(h=-0.03,
                       mtl=material_ref)
 
 receiver = plane(h=8.0,
-                 a=vec([0., 8., 16.]),
-                 b=vec([-32., 8., 16.]),
-                 c=vec([-32., 8., -16.]),
-                 d=vec([0., 8., -16.]),
+                 a=vec([2., 9., 16.]),
+                 b=vec([-32., 9., 16.]),
+                 c=vec([-32., 7., -16.]),
+                 d=vec([2., 7., -16.]),
                  normal=vec([0, -1, 0]),
                  receiver=1,
                  mtl=material_receiver)
@@ -269,15 +272,16 @@ def main():
     #     ray = get_ray(lightSourceType='zebra', middle=vec([6.25, 6.25, 0]), radius=1, step=0.2)
     #     next_ray = rayTrace(ray)
 
-    light_pattern[1, 1] = 1
-    light_pattern[2, 1] = 1
-
-    emission = np.where(np.matrix(light_pattern) == 1)  # 发光像素坐标
-    for i in range(len(emission)):
-        ray_list = get_ray('lightPad', middle=vec([6.25, 6.25, 0]), radius=None, Pad_norm=LCD_Pad.normal)
-        for item_ray in ray_list:
-            next_ray = rayTrace(item_ray)
-    visualization(RECEIVER)
+    # light_pattern[1, 1] = 1
+    # light_pattern[2, 1] = 1
+    #
+    # emission = np.where(np.matrix(light_pattern) == 1)  # 发光像素坐标
+    # for i in range(len(emission)):
+    LP = getLightingPattern(np.zeros((10, 10)), stride=2)
+    ray_list = get_ray('lightPad', middle=vec([6.25, 6.25, 0]), LCD_Pad=LCD_Pad,radius=None, LightPattern=LP)
+    for item_ray in ray_list:
+        next_ray = rayTrace(item_ray)
+    visualization(RECEIVER, LP)
 
 main()
 print(count_mirror, count_ref, count_ref)

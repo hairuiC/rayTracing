@@ -91,27 +91,15 @@ class plane:
         self.normal = vec([self.A, self.C, self.B]) / np.linalg.norm(vec([self.A, self.C, self.B]))
         self.D = (self.normal[0] * x1 + self.normal[1] * y1 + self.normal[2] * z1)
 
-
-
-
-        # self.D = -x1 * (y2 * z3 - y3 * z2) - x2 * (y3 * z1 - y1 * z3) - x3 * (y1 * z2 - y2 * z1)
-        # self.transmission = 1.3
-
-    # def planeSDF(self, p):
-    #     temp = vec([self.A, self.C, self.B])
-    #     return np.dot(p, temp) - self.D
-
     def planeSDF(self, p,):
-        # temp = vec([self.A, self.C, self.B])
-        # print(temp / np.linalg.norm(temp))
-        # print(self.normal)
+
         return np.dot(p, self.normal) - self.D
     def checkSide(self, p):
         # A = self.normal[0]
         # B = self.normal[1]
         # C = self.normal[2]
         D = -np.dot(self.normal, self.d)
-        return np.sign(np.dot(self.normal, p) + D)
+        return np.sign(np.dot(self.normal, p) - D)
         # 小于0与法向量不在同一侧，大于0与法向量在同一侧
 
 
